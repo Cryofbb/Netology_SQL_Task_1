@@ -1,8 +1,5 @@
 package ru.netology;
 
-
-package ru.netology.login;
-
 import com.codeborne.selenide.SelenideElement;
 
 import static com.codeborne.selenide.Condition.visible;

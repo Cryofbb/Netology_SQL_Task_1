@@ -1,11 +1,13 @@
 package ru.netology;
 
+import com.github.javafaker.Faker;
 import lombok.Value;
 
 public class DataHelper {
 
     private DataHelper() {
     }
+
 
     @Value
     public static class AuthInfo {
@@ -18,6 +20,9 @@ public class DataHelper {
     }
 
     public static AuthInfo getInvalidInfo() {
-        return new AuthInfo("kolya", "qwerty");
+        Faker faker = new Faker();
+        String login = faker.pokemon().name();
+        String pass = faker.internet().password();
+        return new AuthInfo(login, pass);
     }
 }
