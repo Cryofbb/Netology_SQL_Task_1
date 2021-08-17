@@ -17,10 +17,10 @@ public class LoginTest {
         open("http://localhost:9999");
     }
 
-    @AfterAll
-    public void cleanBD() {
-        Database.cleanBD();
-    }
+//    @AfterAll
+//    public void cleanBD() {
+//        Database.cleanBD();
+//    }
 
     @Test
     @Order(1)
@@ -66,17 +66,11 @@ public class LoginTest {
     @DisplayName("Block with 3 invalid verify code")
     public void invalidCode3Times() {
         var codePage = new LoginPage();
-        codePage.validLogin(DataHelper.getValidInfo()).validVerify(Database.getInvalidCode());
-        $("[data-test-id=code] .input__control").setValue("12345");
-        $("[data-test-id=action-verify]").click();
+        codePage.validLogin(DataHelper.getValidInfo()).invalidVerify(Database.getInvalidCode());
         open("http://localhost:9999");
-        codePage.validLogin(DataHelper.getValidInfo());
-        $("[data-test-id=code] .input__control").setValue("12345");
-        $("[data-test-id=action-verify]").click();
+        codePage.validLogin(DataHelper.getValidInfo()).invalidVerify(Database.getInvalidCode());
         open("http://localhost:9999");
-        codePage.validLogin(DataHelper.getValidInfo());
-        $("[data-test-id=code] .input__control").setValue("12345");
-        $("[data-test-id=action-verify]").click();
+        codePage.validLogin(DataHelper.getValidInfo()).invalidVerify(Database.getInvalidCode());
         $("[data-test-id=error-notification] .notification__content").shouldBe(visible).shouldHave(exactText("Ошибка! Превышено количество попыток ввода кода!"));
     }
 }
