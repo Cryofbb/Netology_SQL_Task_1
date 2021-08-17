@@ -1,9 +1,9 @@
-package ru.netology;
+package ru.netology.test;
 
-import com.github.javafaker.Faker;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.Keys;
+import ru.netology.data.DataHelper;
+import ru.netology.data.Database;
+import ru.netology.page.LoginPage;
 
 import static com.codeborne.selenide.Condition.exactText;
 import static com.codeborne.selenide.Condition.visible;
@@ -18,22 +18,21 @@ public class LoginTest {
     }
 
     @AfterAll
-    public void cleanBD(){
-    new Database().clearDB();
+    public void cleanBD() {
+        Database.cleanBD();
     }
 
     @Test
-    @SneakyThrows
+    @Order(1)
     @DisplayName("All valid")
     public void validLogin() {
-        var database = new Database();
         var codePage = new LoginPage().validLogin(DataHelper.getValidInfo());
-        codePage.validVerify(database.getCode());
+        codePage.validVerify(Database.getCode());
         $("[data-test-id=dashboard]").shouldBe(visible);
     }
 
     @Test
-    @SneakyThrows
+    @Order(2)
     @DisplayName("Error with invalid user data")
     public void invalidLogin() {
         new LoginPage().validLogin(DataHelper.getInvalidInfo());
@@ -41,47 +40,41 @@ public class LoginTest {
     }
 
     @Test
-    @SneakyThrows
+    @Order(3)
     @DisplayName("Error with invalid verify code")
     public void invalidCode() {
-        var database = new Database();
         var codePage = new LoginPage().validLogin(DataHelper.getValidInfo());
-        $("[data-test-id=code] .input__control").setValue("12345");
-        $("[data-test-id=action-verify]").click();
+        codePage.validVerify(Database.getInvalidCode());
         $("[data-test-id=error-notification] .notification__content").shouldBe(visible).shouldHave(exactText("Ошибка! Неверно указан код! Попробуйте ещё раз."));
     }
 
     @Test
-    @SneakyThrows
+    @Order(4)
     @DisplayName("Block with 3 invalid password")
     public void invalidPass3Times() {
-        Faker faker = new Faker();
-        $("[data-test-id=login] .input__control").setValue("vasya");
-        $("[data-test-id=password] .input__control").setValue(faker.internet().password());
-        $("[data-test-id=action-login]").click();
-        $("[data-test-id=password] .input__control").sendKeys(Keys.chord(Keys.CONTROL + "a", Keys.DELETE));
-        $("[data-test-id=password] .input__control").setValue(faker.internet().password());
-        $("[data-test-id=action-login]").click();
-        $("[data-test-id=password] .input__control").sendKeys(Keys.chord(Keys.CONTROL + "a", Keys.DELETE));
-        $("[data-test-id=password] .input__control").setValue(faker.internet().password());
-        $("[data-test-id=action-login]").click();
+        var loginPage = new LoginPage();
+        loginPage.validLogin(DataHelper.getInvalidPass());
+        open("http://localhost:9999");
+        loginPage.validLogin(DataHelper.getInvalidPass());
+        open("http://localhost:9999");
+        loginPage.validLogin(DataHelper.getInvalidPass());
         $("[data-test-id=error-notification]").shouldBe(visible).shouldHave(exactText("Система заблокирована! Попробуйте позднее"));
     }
 
     @Test
-    @SneakyThrows
+    @Order(5)
     @DisplayName("Block with 3 invalid verify code")
     public void invalidCode3Times() {
-        var database = new Database();
-        var codePage = new LoginPage().validLogin(DataHelper.getValidInfo());
+        var codePage = new LoginPage();
+        codePage.validLogin(DataHelper.getValidInfo()).validVerify(Database.getInvalidCode());
         $("[data-test-id=code] .input__control").setValue("12345");
         $("[data-test-id=action-verify]").click();
         open("http://localhost:9999");
-        var codePage2 = new LoginPage().validLogin(DataHelper.getValidInfo());
+        codePage.validLogin(DataHelper.getValidInfo());
         $("[data-test-id=code] .input__control").setValue("12345");
         $("[data-test-id=action-verify]").click();
         open("http://localhost:9999");
-        var codePage3 = new LoginPage().validLogin(DataHelper.getValidInfo());
+        codePage.validLogin(DataHelper.getValidInfo());
         $("[data-test-id=code] .input__control").setValue("12345");
         $("[data-test-id=action-verify]").click();
         $("[data-test-id=error-notification] .notification__content").shouldBe(visible).shouldHave(exactText("Ошибка! Превышено количество попыток ввода кода!"));

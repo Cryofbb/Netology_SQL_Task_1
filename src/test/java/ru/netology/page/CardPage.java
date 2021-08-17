@@ -1,4 +1,4 @@
-package ru.netology;
+package ru.netology.page;
 
 import com.codeborne.selenide.SelenideElement;
 
@@ -9,6 +9,5 @@ public class CardPage {
     private SelenideElement heading = $("[data-test-id=dashboard]");
 
     public CardPage() {
-        heading.shouldBe(visible);
     }
 }
