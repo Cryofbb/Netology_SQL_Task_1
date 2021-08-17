@@ -11,16 +11,18 @@ import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.open;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+
 public class LoginTest {
     @BeforeEach
     public void setup() {
         open("http://localhost:9999");
     }
 
-//    @AfterAll
-//    public void cleanBD() {
-//        Database.cleanBD();
-//    }
+    @AfterAll
+    public void cleanBD() {
+        Database.cleanBD();
+    }
 
     @Test
     @Order(1)
@@ -44,7 +46,7 @@ public class LoginTest {
     @DisplayName("Error with invalid verify code")
     public void invalidCode() {
         var codePage = new LoginPage().validLogin(DataHelper.getValidInfo());
-        codePage.validVerify(Database.getInvalidCode());
+        codePage.invalidVerify(Database.getInvalidCode());
         $("[data-test-id=error-notification] .notification__content").shouldBe(visible).shouldHave(exactText("Ошибка! Неверно указан код! Попробуйте ещё раз."));
     }
 
